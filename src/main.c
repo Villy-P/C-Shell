@@ -1,19 +1,18 @@
 #include <stdio.h>
-// #include <stdbool.h>
+#include <stdbool.h>
 
 #include "exec.h"
+#include "unistd.h"
 
 #define LINE_BUFFER_SIZE 255
 
 int main() {
-    printf("Hello, World!");
-    // while (true) {
-    //     char input[LINE_BUFFER_SIZE];
-    //     TCHAR buffer[MAX_PATH];
-    //     GetCurrentDirectory(MAX_PATH, buffer);
-    //     printf("%s >", buffer);
-    //     fgets(input, LINE_BUFFER_SIZE, stdin);
-
+    while (true) {
+        char cwd[4096];
+        getcwd(cwd, sizeof(cwd));
+        char input[LINE_BUFFER_SIZE];
+        printf("%s >>>", cwd);
+        fgets(input, LINE_BUFFER_SIZE, stdin);
     //     execute(input);
-    // }
+    }
 }
