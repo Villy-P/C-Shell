@@ -12,12 +12,17 @@ void execute(char* command) {
         printf("fork() caused an error.");
         exit(1);
     } else if (pid == 0) {
-        char* token = strtok(command, " ");
-        char* cmd;
-        strcpy(cmd, token);
-        token = strtok(NULL, " ");
-        execlp(cmd, cmd, token, (char *)NULL);
-        perror("execlp");
+        if (strncmp(command, "cd ", 3) == 0) {
+            command += 3;
+            chdir(command);
+        } else {
+            char* token = strtok(command, " ");
+            char* cmd;
+            strcpy(cmd, token);
+            token = strtok(NULL, " ");
+            execlp(cmd, cmd, token, (char *)NULL);
+            perror("");
+        }
     } else {
         int childStatus;
         wait(&childStatus);
