@@ -1,46 +1,25 @@
-// #include <stdio.h>
-// #include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
 
-// #include "exec.h"
+#include "exec.h"
+#include "unistd.h"
 
-// void execErr() {
-//     DWORD error = GetLastError();
-//     LPSTR errorMessage = NULL;
-//     FormatMessageA(
-//         FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-//         NULL,
-//         error,
-//         MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-//         (LPSTR)&errorMessage,
-//         0,
-//         NULL
-//     );
-//     printf("%s\n", errorMessage);
-// }
-
-// void execute(char* command) {
-//     STARTUPINFO si = { sizeof(si) };
-//     PROCESS_INFORMATION pi;
-
-//     char* runcmd = "cmd /c ";
-//     size_t runcmdLen = strlen(runcmd);
-//     size_t commandLen = strlen(command);
-//     char* cmd = (char*)malloc(runcmdLen + commandLen + 1);
-
-//     strcpy(cmd, runcmd);
-//     strcat(cmd, command);
-
-//     ZeroMemory( &si, sizeof(si) );
-//     si.cb = sizeof(si);
-//     ZeroMemory( &pi, sizeof(pi) );
-
-//     if (!CreateProcess(NULL, cmd, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
-//         execErr();
-//         return;
-//     }
-
-//     WaitForSingleObject(pi.hProcess, INFINITE);
-
-//     CloseHandle(pi.hProcess);
-//     CloseHandle(pi.hThread);
-// }
+void execute(char* command) {
+    __pid_t pid = fork();
+    if (pid < 0) {
+        printf("fork() caused an error.");
+        exit(1);
+    } else if (pid == 0) {
+        char* token = strtok(command, " ");
+        char* cmd;
+        strcpy(cmd, token);
+        token = strtok(NULL, " ");
+        execlp(cmd, cmd, token, (char *)NULL);
+        perror("execlp");
+    } else {
+        int childStatus;
+        wait(&childStatus);
+    }
+}

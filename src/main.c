@@ -13,6 +13,7 @@ int main() {
         char input[LINE_BUFFER_SIZE];
         printf("%s >>>", cwd);
         fgets(input, LINE_BUFFER_SIZE, stdin);
-    //     execute(input);
+        input[strcspn(input, "\n")] = 0;
+        execute(input);
     }
 }
