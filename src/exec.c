@@ -16,9 +16,9 @@ int currentJob = 1;
 Job** jobs = (Job**)NULL;
 
 void addJob(pid_t pid, char* name) {
-    printf("Job added");
     if (currentJob > MAXIM_JOBS)
         return;
+    printf("[%d] %d\n", currentJob, pid);
     Job* j = (Job*)malloc(sizeof(Job));
     j->pid = pid;
     j->name = name;
@@ -60,17 +60,20 @@ void execute(char* command) {
             CloseHandle(pi.hThread);
         }
     #else
-        bool bg = false;
+        bool bg;
+        size_t cmdlen = strlen(command);
+        if (command[cmdlen - 1] == '&') {
+            bg = true;
+            command[cmdlen - 1] = '\0';
+        } else {
+            bg = false;
+        }
         __pid_t pid = fork();
         if (pid < 0) {
             printf("fork() caused an error.");
             exit(1);
         } else if (pid == 0) {
-            size_t cmdlen = strlen(command);
-            if (command[cmdlen - 1] == '&' && command[cmdlen - 2] == ' ') {
-                bg = true;
-                command[cmdlen - 2] = '\0';
-            }
+            printf("\n");
             if (strncmp(command, "cd ", 3) == 0) {
                 command += 3;
                 chdir(command);
@@ -78,7 +81,7 @@ void execute(char* command) {
                 int current = 0;
                 while (jobs[current] != NULL) {
                     printf(
-                        "[%d]%c Running\t\t%s", 
+                        "[%d]%c Running\t\t%s\n", 
                         current + 1, 
                         jobs[current + 1] == NULL 
                             ? '+' 
@@ -88,19 +91,19 @@ void execute(char* command) {
                 }
             } else {
                 char* token = strtok(command, " ");
-                char* cmd;
+                char* cmd = malloc(cmdlen + 1);
                 strcpy(cmd, token);
                 token = strtok(NULL, " ");
                 execlp(cmd, cmd, token, (char *)NULL);
+                free(cmd);
                 perror("");
             }
         } else {
-            printf("%d\n", bg);
             int childStatus;
             if (!bg)
                 wait(&childStatus);
             else
-                printf("WOW");
+                addJob(pid, command);
         }
     #endif
 }
