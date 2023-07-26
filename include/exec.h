@@ -6,11 +6,14 @@
 #define MAXIM_JOBS 255
 
 typedef struct {
+    int id;
     pid_t pid;
     char* name;
+    int status;
 } Job;
 
-void addJob(pid_t pid, char* name);
+int getNextJobID();
+void addJob(pid_t pid, char* name, int status);
 void execute(char* command);
 
 #endif

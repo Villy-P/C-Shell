@@ -12,20 +12,35 @@
 #include <sys/wait.h>
 #endif
 
-int currentJob = 1;
+enum JOB_STATUS {
+    FG,
+    BG,
+    STOPPED,
+    KILLED
+};
+
+int jobsLen = 0;
 Job** jobs = (Job**)NULL;
 
-void addJob(pid_t pid, char* name) {
-    if (currentJob > MAXIM_JOBS)
-        return;
-    printf("[%d] %d\n", currentJob, pid);
+int getNextJobID() {
+    if (jobsLen == 0)
+        return 1;
+    return jobs[jobsLen - 1]->id + 1;
+}
+
+void addJob(pid_t pid, char* name, int status) {
+    int id = getNextJobID();
+    if (status == BG)
+        printf("[%d] %d\n", id, pid);
     Job* j = (Job*)malloc(sizeof(Job));
     j->pid = pid;
     j->name = name;
-    jobs = (Job**)realloc(jobs, sizeof(Job*) * (currentJob + 1));
-    jobs[currentJob - 1] = j;
-    jobs[currentJob] = NULL;
-    currentJob++;
+    j->id = id;
+    j->status = status;
+    jobs = (Job**)realloc(jobs, sizeof(Job*) * (jobsLen + 1));
+    jobs[jobsLen] = j;
+    jobs[jobsLen + 1] = NULL;
+    jobsLen++;
 }
 
 void execute(char* command) {
@@ -100,10 +115,9 @@ void execute(char* command) {
             }
         } else {
             int childStatus;
+            addJob(pid, command, bg ? BG : FG);
             if (!bg)
                 wait(&childStatus);
-            else
-                addJob(pid, command);
         }
     #endif
 }
