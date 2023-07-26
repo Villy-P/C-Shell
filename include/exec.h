@@ -10,9 +10,6 @@ typedef struct {
     char* name;
 } Job;
 
-extern int currentJob;
-extern Job** jobs;
-
 void addJob(pid_t pid, char* name);
 void execute(char* command);
 

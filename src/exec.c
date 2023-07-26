@@ -12,16 +12,19 @@
 #include <sys/wait.h>
 #endif
 
-currentJob = 1;
+int currentJob = 1;
+Job** jobs = (Job**)NULL;
 
 void addJob(pid_t pid, char* name) {
+    printf("Job added");
     if (currentJob > MAXIM_JOBS)
         return;
     Job* j = (Job*)malloc(sizeof(Job));
     j->pid = pid;
     j->name = name;
-    // jobs = realloc(jobs, sizeof(Job*) * )
-    // jobs[currentJob - 1] = j;
+    jobs = (Job**)realloc(jobs, sizeof(Job*) * (currentJob + 1));
+    jobs[currentJob - 1] = j;
+    jobs[currentJob] = NULL;
     currentJob++;
 }
 
@@ -92,11 +95,12 @@ void execute(char* command) {
                 perror("");
             }
         } else {
+            printf("%d\n", bg);
             int childStatus;
             if (!bg)
                 wait(&childStatus);
             else
-                addJob(pid, command);
+                printf("WOW");
         }
     #endif
 }
