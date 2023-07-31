@@ -19,8 +19,8 @@ enum JOB_STATUS {
     KILLED
 };
 
-int jobsLen = 0;
-Job** jobs = (Job**)NULL;
+int jobsLen;
+Job** jobs;
 
 int getNextJobID() {
     if (jobsLen == 0)
@@ -29,6 +29,7 @@ int getNextJobID() {
 }
 
 void addJob(pid_t pid, char* name, int status) {
+    printf("Job: %s\n", name);
     int id = getNextJobID();
     if (status == BG)
         printf("[%d] %d\n", id, pid);
@@ -37,7 +38,7 @@ void addJob(pid_t pid, char* name, int status) {
     j->name = name;
     j->id = id;
     j->status = status;
-    jobs = (Job**)realloc(jobs, sizeof(Job*) * (jobsLen + 1));
+    jobs = (Job**)realloc(jobs, sizeof(Job*) * (jobsLen + 2));
     jobs[jobsLen] = j;
     jobs[jobsLen + 1] = NULL;
     jobsLen++;
@@ -94,10 +95,11 @@ void execute(char* command) {
                 chdir(command);
             } else if (strcmp(command, "jobs") == 0) {
                 int current = 0;
+                printf("0-index: %s\n", jobs[0]->name);
                 while (jobs[current] != NULL) {
                     printf(
                         "[%d]%c Running\t\t%s\n", 
-                        current + 1, 
+                        jobs[current]->id, 
                         jobs[current + 1] == NULL 
                             ? '+' 
                             : '-', 
@@ -115,6 +117,7 @@ void execute(char* command) {
             }
         } else {
             int childStatus;
+            printf("Command: %s\n", command);
             addJob(pid, command, bg ? BG : FG);
             if (!bg)
                 wait(&childStatus);

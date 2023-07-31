@@ -12,7 +12,12 @@
 
 #define LINE_BUFFER_SIZE 255
 
+extern int jobsLen;
+extern Job** jobs;
+
 int main() {
+    jobsLen = 0;
+    jobs = calloc(sizeof(Job*), 1);
     while (true) {
         char cwd[4096];
         #ifdef _WIN32
