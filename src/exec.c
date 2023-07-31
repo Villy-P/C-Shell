@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "exec.h"
+#include "../include/exec.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -106,6 +106,8 @@ void execute(char* command) {
                         jobs[current]->name);
                     current++;
                 }
+            } else if (strcmp(command, "exit") == 0) {
+                exit(0);
             } else {
                 char* token = strtok(command, " ");
                 char* cmd = malloc(cmdlen + 1);

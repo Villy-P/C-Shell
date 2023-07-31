@@ -1,13 +1,15 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <stdlib.h>
 
-#include "exec.h"
+#include "../include/exec.h"
 
 #ifdef _WIN32
 #include <windows.h>
 #else
 #include "unistd.h"
+#include <signal.h>
 #endif
 
 #define LINE_BUFFER_SIZE 255
@@ -16,6 +18,7 @@ extern int jobsLen;
 extern Job** jobs;
 
 int main() {
+    signal(SIGINT, SIG_IGN);
     jobsLen = 0;
     jobs = calloc(sizeof(Job*), 1);
     while (true) {
@@ -29,6 +32,8 @@ int main() {
         printf("%s >>>", cwd);
         fgets(input, LINE_BUFFER_SIZE, stdin);
         input[strcspn(input, "\n")] = 0;
-        execute(input);
+        char* cmd = malloc(strlen(input) + 1);
+        strcpy(cmd, input);
+        execute(cmd);
     }
 }
