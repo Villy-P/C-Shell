@@ -29,7 +29,6 @@ int getNextJobID() {
 }
 
 void addJob(pid_t pid, char* name, int status) {
-    printf("Job: %s\n", name);
     int id = getNextJobID();
     if (status == BG)
         printf("[%d] %d\n", id, pid);
@@ -119,7 +118,6 @@ void execute(char* command) {
             }
         } else {
             int childStatus;
-            printf("Command: %s\n", command);
             addJob(pid, command, bg ? BG : FG);
             if (!bg)
                 wait(&childStatus);
