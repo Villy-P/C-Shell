@@ -18,7 +18,6 @@ extern int jobsLen;
 extern Job** jobs;
 
 int main() {
-    signal(SIGINT, SIG_IGN);
     jobsLen = 0;
     jobs = calloc(sizeof(Job*), 1);
     while (true) {

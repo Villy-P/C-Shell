@@ -12,8 +12,10 @@ typedef struct {
     int status;
 } Job;
 
+void handleSigChild(int signum);
+char* getJobStatus(int status);
 int getNextJobID();
-void addJob(pid_t pid, char* name, int status);
+Job* addJob(pid_t pid, char* name, int status);
 void execute(char* command);
 
 #endif
