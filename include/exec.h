@@ -12,6 +12,8 @@ typedef struct {
     int status;
 } Job;
 
+Job* getByPid(pid_t pid);
+void removeByPid(pid_t pid);
 void handleSigChild(int signum);
 char* getJobStatus(int status);
 int getNextJobID();

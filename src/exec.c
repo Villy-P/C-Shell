@@ -23,15 +23,33 @@ enum JOB_STATUS {
 int jobsLen;
 Job** jobs;
 
+Job* getByPid(pid_t pid) {
+    for (int i = 0; i < jobsLen; i++)
+        if (jobs[i]->pid == pid)
+            return jobs[i];
+    return jobs[0];
+}
+
+void removeByPid(pid_t pid) {
+    for (int i = 0; i < jobsLen; i++) {
+        if (jobs[i]->pid == pid) {
+            for (int j = i; j < jobsLen - 1; j++)
+                jobs[j] = jobs[j + 1];
+            jobsLen--;
+            jobs = realloc(jobs, (jobsLen) * sizeof(Job**));
+            break;
+        }
+    }
+}
+
 void handleSigChild(int signum) {
     int status;
     pid_t pid;
     while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
         if (WIFEXITED(status)) {
-            for (int i = 0; i < jobsLen; i++) {
-                // if (jobs[i]->pid == pid)
-                    
-            }
+            Job* jobData = getByPid(pid);
+            printf("[%d]+ Done\t\t%s\n", jobData->id, jobData->name);
+            removeByPid(pid);
         }
     }
 }
@@ -120,6 +138,8 @@ void execute(char* command) {
             } else if (strcmp(command, "jobs") == 0) {
                 int current = 0;
                 while (jobs[current] != NULL) {
+                    if (jobs[current]->status == FG)
+                        continue;
                     printf(
                         "[%d]%c %s\t\t%s\n", 
                         jobs[current]->id, 
@@ -146,8 +166,10 @@ void execute(char* command) {
             int childStatus;
             signal(SIGCHLD, handleSigChild);
             addJob(pid, command, bg ? BG : FG);
-            if (!bg)
+            if (!bg) {
                 wait(&childStatus);
+                removeByPid(pid);
+            }
         }
     #endif
 }
