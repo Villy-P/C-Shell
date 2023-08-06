@@ -10,6 +10,7 @@
 #else
 #include "unistd.h"
 #include <sys/wait.h>
+#include <sys/types.h>
 #include "signal.h"
 #endif
 
@@ -144,7 +145,7 @@ void execute(char* command) {
                         "[%d]%c %s\t\t%s\n", 
                         jobs[current]->id, 
                         jobs[current + 1] == NULL 
-                            ? '-' 
+                            ? '+' 
                             : '+', 
                         getJobStatus(jobs[current]->status),
                         jobs[current]->name);
@@ -162,7 +163,6 @@ void execute(char* command) {
                 perror("");
             }
         } else {
-            
             int childStatus;
             signal(SIGCHLD, handleSigChild);
             addJob(pid, command, bg ? BG : FG);

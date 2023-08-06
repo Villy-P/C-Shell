@@ -2,6 +2,7 @@
 #define __EXEC_H__
 
 #include <unistd.h>
+#include <sys/wait.h>
 
 #define MAXIM_JOBS 255
 
@@ -12,6 +13,7 @@ typedef struct {
     int status;
 } Job;
 
+void handleSigTerminalStop(int signum);
 Job* getByPid(pid_t pid);
 void removeByPid(pid_t pid);
 void handleSigChild(int signum);
