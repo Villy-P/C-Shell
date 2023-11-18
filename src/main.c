@@ -19,22 +19,23 @@ extern int jobsLen;
 extern Job** jobs;
 
 void handleSigTerminalStop(int signum) {
-    printf("I WAS HERE");
+    // printf("I WAS HERE");
     Job* lastJob = jobs[jobsLen - 1];
     if (lastJob->status != 0)
         return;
-    lastJob->status = 2;
-    printf("[%d]+ Stopped\t\t%s\n", lastJob->id, lastJob->name);
-    // kill(lastJob->pid, SIGTSTP);
+    lastJob->status = 3;
+    // printf("[%d]+ Stopped\t\t%s\n", lastJob->id, lastJob->name);
+    kill(lastJob->pid, SIGTSTP);
 }
 
 int main() {
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = handleSigTerminalStop;
-    sa.sa_flags = 0;
-    if (sigaction(SIGTSTP, &sa, NULL) == -1)
-        perror("sigaction");
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_RESTART;
+    sigaction(SIGINT, &sa, NULL);
+
     jobsLen = 0;
     jobs = calloc(sizeof(Job*), 1);
     while (true) {
