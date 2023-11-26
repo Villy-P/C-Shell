@@ -1,8 +1,10 @@
 #ifndef __EXEC_H__
 #define __EXEC_H__
 
+#ifndef _WIN32
 #include <unistd.h>
 #include <sys/wait.h>
+#endif
 
 #define MAXIM_JOBS 255
 
